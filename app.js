@@ -2,11 +2,36 @@
 var project = require('pillars');
 
 // Configuración del proyecto mediante .configure()
-project.configure({debug:true, renderReload: true});
+project.configure({
+	debug:true, 
+	renderReload: true,
+	cors: false,
+	maxUploadSize: 1*1024*1024
+});
 
 // Pillars.js incorpora un servicio http built-in, así que tomamos e iniciamos del servicio http, mediante el método .start();
 // Para configurar el servicio, se usa el método .configure()
-project.services.get('http').configure({port:3001}).start();
+project.services.get('http').configure({
+	port:3001,
+	timeout: 8000
+}).start();
+
+// Hola Mundo con las propiedades de route
+project.routes.add(new Route({
+	port: 3001,
+	path:"hola",
+	method: "GET",
+	host: "localhost",
+	https: false,
+	multipart: false,
+	cors: false,
+	session: true
+},gw=>{
+	gw.session.counter = gw.session.counter || 0;
+	gw.session.counter++;	
+	gw.html("Hola Mundo, esta es tu visita:"+ gw.session.counter);
+}));
+
 
 //Creación de un nuevo servicio http
 project.services.add((new HttpService({
